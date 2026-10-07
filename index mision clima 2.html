@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Misión Clima: Expediente México</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Atkinson+Hyperlegible:wght@400;700&family=Special+Elite&display=swap" rel="stylesheet">
+<style>
+:root{
+  --noche:#0e1433; --noche-2:#080c22; --papel:#f3e9d2; --papel-2:#e8dab8; --tinta:#1c1a17;
+  --rosa:#d1006c; --cempa:#f2a900; --verde:#2f8f4e; --naranja:#e4661a; --rojo:#b3241c; --sello:#a3122a;
+  --display:'Alfa Slab One', Rockwell, Georgia, serif;
+  --texto:'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --maquina:'Special Elite', 'Courier New', Courier, monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(ellipse at top,#1a2250 0%,var(--noche) 45%,var(--noche-2) 100%) fixed;color:var(--papel);
+  font-family:var(--texto);font-size:16px;line-height:1.5;min-height:100vh;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body.senal{filter:sepia(1) hue-rotate(60deg) saturate(2.2) brightness(.95)}
+.picado{height:26px;background:conic-gradient(from -45deg at 50% 100%, var(--rosa) 90deg, transparent 0) 0 0/32px 100%,
+  linear-gradient(var(--cempa),var(--cempa)) 0 0/100% 5px no-repeat;opacity:.85}
+main{max-width:860px;margin:0 auto;padding:14px 14px 48px}
+.pantalla{display:none}.pantalla.activa{display:block;animation:aparece .35s ease}
+@keyframes aparece{from{opacity:0}to{opacity:1}}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.12;margin:0 0 .4em}
+h1{font-size:clamp(2rem,8vw,3.4rem);color:var(--cempa)}
+h2{font-size:clamp(1.35rem,5vw,1.9rem)}
+h3{font-size:1.12rem}
+p{margin:0 0 .75em}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--cempa);outline-offset:3px}
+.btn{font-family:var(--display);font-size:1rem;background:var(--cempa);color:var(--tinta);border:3px solid var(--tinta);border-radius:6px;
+  padding:.6em 1.1em;min-height:48px;box-shadow:4px 4px 0 #000;cursor:pointer;touch-action:manipulation}
+.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #000}
+.btn.sec{background:var(--papel)} .btn.rosa{background:var(--rosa);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ancho{width:100%}
+.muted{opacity:.75;font-size:.92rem}
+.liga{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;padding:10px 4px}
+/* Papel de expediente */
+.doc{background:var(--papel);color:var(--tinta);border-radius:4px;padding:18px 16px;position:relative;box-shadow:0 10px 30px rgba(0,0,0,.45);
+  background-image:repeating-linear-gradient(transparent 0 27px,rgba(28,26,23,.06) 27px 28px)}
+.doc+.doc{margin-top:16px}
+.maquina{font-family:var(--maquina)}
+.sello{position:absolute;top:12px;right:10px;transform:rotate(8deg);border:3px solid var(--sello);color:var(--sello);font-family:var(--display);
+  padding:2px 8px;font-size:.85rem;opacity:.8;border-radius:4px}
+.nota{font-family:var(--maquina);font-size:1.02rem;line-height:1.55;background:rgba(242,169,0,.13);border-left:4px solid var(--cempa);padding:10px 12px;margin:10px 0}
+/* Intro */
+.terminal{font-family:var(--maquina);color:#cfe8d6;background:#05070f;border:2px solid #22305e;border-radius:6px;padding:16px;min-height:220px;font-size:1rem;line-height:1.6;white-space:pre-wrap}
+.cursor::after{content:'▌';animation:parpadeo 1s steps(1) infinite}
+@keyframes parpadeo{50%{opacity:0}}
+.campo{display:flex;flex-direction:column;gap:4px;font-weight:700;margin-bottom:10px}
+.campo input,.campo select{padding:11px 12px;border:2px solid var(--tinta);border-radius:6px;background:#fff;color:var(--tinta);min-height:48px;width:100%}
+.fila{display:flex;gap:10px;flex-wrap:wrap}.fila>*{flex:1 1 120px}
+/* Estación */
+.cab-est{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.lampara{background:none;border:0;font-size:1.7rem;cursor:pointer;padding:4px;animation:titila 6s infinite;line-height:1}
+@keyframes titila{0%,93%,100%{opacity:1}94%{opacity:.25}95%{opacity:.9}96%{opacity:.2}97%{opacity:1}}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.chip{border:1.5px solid rgba(243,233,210,.6);border-radius:999px;padding:3px 10px;font-weight:700;font-size:.85rem;white-space:nowrap}
+.chip.oculto{display:none}
+.carpetas{display:grid;gap:14px}
+@media(min-width:700px){.carpetas{grid-template-columns:repeat(3,1fr)}}
+.carpeta{text-align:left;background:linear-gradient(#d9b977,#c9a55e);color:var(--tinta);border:0;border-radius:3px 12px 4px 4px;padding:18px 14px 14px;cursor:pointer;
+  position:relative;box-shadow:0 8px 18px rgba(0,0,0,.45);min-height:150px}
+.carpeta::before{content:'';position:absolute;top:-10px;left:0;width:42%;height:12px;background:#c9a55e;border-radius:6px 6px 0 0}
+.carpeta .num{font-family:var(--maquina);font-size:.85rem;opacity:.8}
+.carpeta h3{margin:6px 0 4px}
+.carpeta .lugar{font-size:.86rem}
+.carpeta .estado{position:absolute;bottom:10px;right:10px;font-family:var(--display);font-size:.8rem;border:2px solid currentColor;padding:1px 6px;border-radius:3px;transform:rotate(-6deg)}
+.carpeta.cerrado .estado{color:var(--verde)} .carpeta .estado{color:var(--sello)}
+.boveda{margin-top:18px;background:#141a3c;border:3px solid #39457e;border-radius:10px;padding:16px;text-align:center}
+.ruedas{display:flex;justify-content:center;gap:10px;margin:12px 0}
+.rueda{display:flex;flex-direction:column;align-items:center;gap:4px}
+.rueda button{width:56px;height:40px;border:2px solid #000;background:var(--papel-2);border-radius:6px;cursor:pointer;font-size:1.1rem;touch-action:manipulation}
+.rueda .d{width:56px;height:64px;display:flex;align-items:center;justify-content:center;font-family:var(--display);font-size:2.2rem;background:#05070f;color:var(--cempa);border:2px solid #39457e;border-radius:6px}
+.pistas-boveda{font-family:var(--maquina);text-align:left;background:rgba(0,0,0,.25);padding:10px;border-radius:6px;margin-top:10px}
+/* Caso */
+.volver{margin-bottom:10px}
+.coord{font-family:var(--maquina);font-size:.85rem;opacity:.8}
+.paso{margin-top:18px;padding-top:14px;border-top:2px dashed rgba(28,26,23,.35)}
+.paso h3{display:flex;align-items:center;gap:8px}
+.paso h3 .ok{color:var(--verde);font-size:1rem}
+.grafica{background:#fff;border:2px solid var(--tinta);border-radius:6px;padding:8px;margin:8px 0}
+.grafica svg{width:100%;height:auto;display:block}
+.fuente{font-size:.78rem;opacity:.7;margin:4px 2px 0}
+.candado{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#141a3c;color:var(--papel);border-radius:8px;padding:12px;margin-top:10px}
+.candado .rueda .d{height:58px}
+.candado .txt{flex:1 1 180px;font-size:.95rem}
+.msg{min-height:1.3em;font-weight:700;margin:8px 0 0}
+.msg.bien{color:var(--verde)} .msg.mal{color:var(--rojo)}
+.candado .msg.bien{color:#7ee2a0} .candado .msg.mal{color:#ff8a80}
+.ficha{border:2px solid var(--tinta);background:#fff;border-radius:6px;padding:10px;margin-bottom:8px}
+.ficha p{margin:0 0 8px}
+.dos{display:flex;gap:6px}
+.dos button,.opc{flex:1;border:2px solid var(--tinta);background:var(--papel);border-radius:6px;padding:8px;cursor:pointer;font-weight:700;min-height:44px;color:var(--tinta);touch-action:manipulation}
+.dos button[aria-pressed=true]{background:var(--tinta);color:var(--papel)}
+.opc{display:block;width:100%;text-align:left;font-weight:400;margin-bottom:8px;padding:10px 12px}
+.opc[aria-pressed=true]{background:var(--cempa);font-weight:700}
+.ficha.mal,.opc.mal{border-color:var(--rojo);background:#fbe3e0}
+.ficha.bien,.opc.bien{border-color:var(--verde);background:#e2f4e8}
+.expl{font-size:.88rem;margin-top:6px;color:#5a1a14}
+.misterio{display:flex;gap:10px;align-items:flex-start;background:#fff;border:2px solid var(--tinta);border-radius:6px;padding:10px;margin-bottom:8px}
+.misterio .me{font-size:1.8rem;line-height:1}
+.revelado{background:#e2f4e8;border:2px solid var(--verde);border-radius:6px;padding:10px 12px;margin-top:10px}
+.pistab{margin-top:8px}
+.pista-txt{font-family:var(--maquina);background:rgba(242,169,0,.15);border-radius:4px;padding:6px 10px;margin-top:6px;font-size:.95rem}
+.oculto{display:none!important}
+/* Final */
+.carta{font-family:var(--maquina);font-size:1.05rem;line-height:1.7}
+.cuentas{width:100%;border-collapse:collapse;margin:10px 0}
+.cuentas td{padding:5px 0;border-bottom:1px dashed rgba(0,0,0,.25)}
+.cuentas td:last-child{text-align:right;font-weight:700}
+.tabla-rank{width:100%;border-collapse:collapse;font-size:.92rem}
+.tabla-rank th,.tabla-rank td{padding:6px 4px;border-bottom:1px solid rgba(0,0,0,.15);text-align:left}
+.scroll-x{overflow-x:auto}
+.seg{display:inline-flex;border:2px solid var(--tinta);border-radius:6px;overflow:hidden;margin:6px 0 10px}
+.seg button{border:0;background:#fff;padding:8px 12px;cursor:pointer;font-weight:700;color:var(--tinta)}
+.seg button[aria-pressed=true]{background:var(--tinta);color:var(--papel)}
+/* Modal propio (funciona en cualquier navegador) */
+.modal{position:fixed;inset:0;background:rgba(3,5,15,.82);display:none;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal.abierto{display:flex}
+.modal .doc{max-width:520px;width:100%;max-height:88vh;overflow:auto}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#05070f;color:var(--cempa);border:2px solid var(--cempa);
+  border-radius:8px;padding:10px 16px;font-family:var(--maquina);z-index:120;max-width:92vw;text-align:center;display:none}
+.toast.ver{display:block;animation:aparece .3s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="picado" aria-hidden="true"></div>
+<main>
+
+<!-- INTRO -->
+<section id="p-intro" class="pantalla activa">
+  <h1>Misión Clima</h1>
+  <p class="maquina" style="color:var(--cempa);margin-top:-6px">Expediente México</p>
+  <div class="terminal" id="terminal" aria-live="polite"></div>
+  <div class="fila" style="margin-top:12px">
+    <button class="btn" id="b-continuar-intro">Continuar</button>
+  </div>
+</section>
+
+<!-- REGISTRO -->
+<section id="p-registro" class="pantalla">
+  <div class="doc">
+    <span class="sello">ACCESO</span>
+    <h2>Registro de investigador</h2>
+    <p class="maquina">Para abrir la estación necesitamos saber quién eres.</p>
+    <div class="campo"><label for="i-nombre">Nombre y apellido</label><input id="i-nombre" maxlength="40" autocomplete="off"></div>
+    <div class="campo"><label for="i-sec">Secundaria</label><input id="i-sec" maxlength="60" autocomplete="off" placeholder="Ej. Secundaria Técnica 45"></div>
+    <div class="fila">
+      <div class="campo"><label for="i-grado">Grado</label><select id="i-grado"><option>1°</option><option>2°</option><option>3°</option></select></div>
+      <div class="campo"><label for="i-letra">Grupo</label><select id="i-letra"><option>A</option><option>B</option><option>C</option><option>D</option><option>E</option><option>F</option><option>G</option><option>H</option><option>I</option><option>J</option></select></div>
+    </div>
+    <p class="msg mal" id="msg-reg" role="status"></p>
+    <button class="btn ancho" id="b-entrar">Entrar a la estación</button>
+  </div>
+</section>
+
+<!-- ESTACIÓN -->
+<section id="p-estacion" class="pantalla">
+  <div class="cab-est">
+    <button class="lampara" id="lampara" aria-label="Lámpara de la estación">💡</button>
+    <div><h2 style="margin:0">Estación Xólotl</h2><span class="muted maquina">Último acceso: hace 2 años</span></div>
+    <div class="chips"><span class="chip" id="c-tiempo">⏱ 0:00</span><span class="chip" id="c-dig">🔑 0/3</span><span class="chip oculto" id="c-sec">✦ 0/3</span></div>
+  </div>
+  <div class="doc" style="margin-bottom:18px;padding-top:44px">
+    <span class="sello">CONFIDENCIAL</span>
+    <p class="maquina" id="nota-estacion"></p>
+  </div>
+  <div class="carpetas" id="carpetas"></div>
+  <div class="boveda" id="boveda">
+    <h3 style="color:var(--cempa)">Bóveda de la Dra. Navarro</h3>
+    <p class="muted" id="bov-txt">Tres cerraduras. Tres expedientes. Cada uno guarda un número.</p>
+    <div class="ruedas" id="ruedas-bov"></div>
+    <div class="pistas-boveda oculto" id="nota-bov"></div>
+    <p class="msg" id="msg-bov" role="status"></p>
+    <div class="fila" style="max-width:420px;margin:0 auto">
+      <button class="btn" id="b-abrir" disabled>Abrir bóveda</button>
+      <button class="btn sec" id="b-pista-bov" disabled>Pedir pista</button>
+    </div>
+    <div id="pistas-bov-txt"></div>
+  </div>
+</section>
+
+<!-- CASO -->
+<section id="p-caso" class="pantalla">
+  <button class="liga volver" id="b-volver">← Volver a la estación</button>
+  <div class="doc" id="caso"></div>
+</section>
+
+<!-- FINAL -->
+<section id="p-final" class="pantalla">
+  <div class="doc">
+    <span class="sello" style="color:var(--verde);border-color:var(--verde)">ABIERTO</span>
+    <h2>La bóveda se abrió</h2>
+    <div class="carta" id="carta"></div>
+  </div>
+  <div class="doc">
+    <h3>Lo que descubriste</h3>
+    <ul id="descubriste" style="padding-left:20px;margin:0"></ul>
+  </div>
+  <div class="doc">
+    <h3>Tu expediente</h3>
+    <table class="cuentas" id="cuentas"></table>
+    <div class="fila"><button class="btn" id="b-enviar">Enviar al registro</button><button class="btn sec" id="b-copiar">Copiar resumen</button></div>
+    <p class="msg" id="msg-final" role="status"></p>
+    <h3 style="margin-top:14px">Registro de investigadores</h3>
+    <div id="ranking"></div>
+    <button class="liga" id="b-nueva" style="color:var(--tinta)">Empezar una investigación nueva</button>
+  </div>
+</section>
+
+<p class="muted" style="text-align:center;margin-top:24px;font-size:.78rem">Las gráficas marcadas como «simuladas» son datos de ejemplo para el juego; los hechos científicos de las explicaciones son reales.</p>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="doc" id="modal-doc"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(function(){
+'use strict';
+/* ====== CONFIGURACIÓN DEL DOCENTE ======
+   URL /exec del registro único de los juegos (misma hoja para todos; este juego usa la pestaña «Expedientes»).
+   Panel oculto: agrega ?docente al final de la dirección.                    */
+const CONFIG={urlAppsScript:'https://script.google.com/macros/s/AKfycbygRk9A6WzIUDJGxFjJY659rdNhNQchklDIGif_iAygyiV6eDChynsv8Lxs-2tE_TMahg/exec'};
+
+const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const barajar=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const mmss=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+const ls={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+const PTS={base:1000,error:40,pista:80,secreto:50};
+const reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Gráficas SVG ---------- */
+function barras({datos,unidad,maxY,umbral,umbralTxt,promedio,linea,color,rotar,extra=''}){
+  const W=360,H=230,l=34,r=8,t=14,b=rotar?46:28,n=datos.length,ancho=(W-l-r)/n;
+  const Y=v=>t+(H-t-b)*(1-v/maxY);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Gráfica">`;
+  [0,.25,.5,.75,1].forEach(f=>{const v=maxY*f,y=Y(v);s+=`<line x1="${l}" y1="${y}" x2="${W-r}" y2="${y}" stroke="#ddd"/><text x="${l-4}" y="${y+4}" font-size="10" text-anchor="end" fill="#555">${+v.toFixed(1)}</text>`});
+  datos.forEach(([et,v],i)=>{const x=l+i*ancho+ancho*.15,w=ancho*.7;
+    if(linea){if(i>0){const [,pv]=datos[i-1];s+=`<line x1="${x-ancho+w/2}" y1="${Y(pv)}" x2="${x+w/2}" y2="${Y(v)}" stroke="${color}" stroke-width="2.5"/>`}
+      s+=`<circle cx="${x+w/2}" cy="${Y(v)}" r="3.5" fill="${color}"/>`}
+    else{const c=typeof color==='function'?color(v):color;s+=`<rect x="${x}" y="${Y(v)}" width="${w}" height="${Y(0)-Y(v)}" fill="${c}"/>`}
+    const tx=x+w/2,ty=H-b+12;
+    s+=rotar?`<text x="${tx}" y="${ty}" font-size="9.5" fill="#333" text-anchor="end" transform="rotate(-45 ${tx} ${ty})">${et}</text>`:`<text x="${tx}" y="${ty}" font-size="10" fill="#333" text-anchor="middle">${et}</text>`});
+  if(umbral!=null)s+=`<line x1="${l}" y1="${Y(umbral)}" x2="${W-r}" y2="${Y(umbral)}" stroke="#b3241c" stroke-width="1.8" stroke-dasharray="5 4"/><text x="${W-r}" y="${Y(umbral)-4}" font-size="10" fill="#b3241c" text-anchor="end" font-weight="700">${umbralTxt||''}</text>`;
+  if(promedio!=null)s+=`<line x1="${l}" y1="${Y(promedio)}" x2="${W-r}" y2="${Y(promedio)}" stroke="#22307b" stroke-width="1.8" stroke-dasharray="5 4"/><text x="${l+4}" y="${Y(promedio)-4}" font-size="10" fill="#22307b" font-weight="700">promedio</text>`;
+  s+=`<text x="${l}" y="10" font-size="10" fill="#555">${unidad}</text>`+extra+`</svg>`;
+  return s;
+}
+
+/* ---------- Los tres expedientes ---------- */
+const CASOS=[
+{id:'caribe',num:'EXP-01',titulo:'Dos manchas en el mar',lugar:'Puerto Morelos, Quintana Roo',coord:'20.8° N · 86.9° O',
+ nota:'14 de agosto. Desde la lancha vi dos cosas: el arrecife blanco como hueso y una alfombra café que llegaba a la playa. En el pueblo dicen que es lo mismo. No lo es. Dejé los registros de la boya.',
+ p1:{titulo:'Evidencia 1: la boya del arrecife',
+  grafica:()=>barras({datos:[['2016',2],['2017',3],['2018',1],['2019',5],['2020',4],['2021',3],['2022',4],['2023',9],['2024',7]],unidad:'semanas',maxY:10,color:'#e4661a'}),
+  fuente:'Semanas al año con el agua arriba de 30 °C. Datos simulados de la boya de la estación.',
+  pregunta:'El candado de este expediente pide <b>el último dígito del año con más semanas de agua caliente</b>.',
+  resp:3,pistas:['Busca la barra más alta de la gráfica.','La barra más alta es la de 2023. ¿Cuál es su último dígito?'],
+  dato:'En 2023 el Caribe vivió una ola de calor marina récord, y muchos arrecifes se blanquearon. Con el agua demasiado caliente durante semanas, el coral expulsa a las algas microscópicas que viven dentro de él y le dan alimento y color.'},
+ p2:{tipo:'clasificar',titulo:'Evidencia 2: separa los dos misterios',
+  misterios:[['🪸','Misterio 1: el arrecife blanco','Los corales perdieron su color y se ven blancos como hueso. A esto se le llama <b>blanqueamiento</b>.'],
+             ['🟤','Misterio 2: la alfombra café','Montones de <b>sargazo</b>, un alga grande y café que vive flotando en el mar, llegan a la playa.']],
+  intro:'Itzel dejó seis pistas revueltas, pero no anotó de cuál misterio habla cada una. Léelas y decide: <b>¿la pista habla del arrecife blanco o del sargazo?</b> Ayúdate con lo que descubriste en la evidencia 1.',
+  cats:['🪸 Arrecife blanco','🟤 Sargazo'],
+  fichas:[
+   ['El agua estuvo arriba de 30 °C durante varias semanas.',0,'Habla del arrecife blanco: el calor prolongado es lo que provoca el blanqueamiento.'],
+   ['Se quedó sin las algas microscópicas que vivían dentro de sus tejidos.',0,'Habla del arrecife blanco. Ojo: estas algas son microscópicas y viven dentro del coral; no son el sargazo.'],
+   ['Si el agua se enfría a tiempo, puede recuperarse.',0,'Habla del arrecife blanco: un coral blanqueado sigue vivo un tiempo, pero si el calor dura mucho, muere.'],
+   ['Los fertilizantes que los ríos llevan al mar le sirven de alimento para crecer.',1,'Habla del sargazo: el exceso de nutrientes es una de las principales razones de que crezca tanto.'],
+   ['Las corrientes del océano lo arrastran desde el Atlántico hasta las playas.',1,'Habla del sargazo: crece en el Atlántico y las corrientes lo traen hasta nuestras costas.'],
+   ['Flota gracias a pequeñas bolsitas de aire.',1,'Habla del sargazo: por eso flota y forma alfombras en la superficie.']],
+  revelado:'<b>Mito resuelto:</b> no son el mismo problema. El coral blanco se debe al <b>calor del agua</b>. El sargazo crece sobre todo por <b>nutrientes y corrientes</b>; el calentamiento puede influir, pero no es su causa principal. Confundirlos lleva a soluciones equivocadas.'},
+ aprendiste:'El coral blanco y el sargazo son problemas distintos: el primero lo causa el calor; el segundo, sobre todo los nutrientes y las corrientes.'},
+{id:'monarca',num:'EXP-02',titulo:'¿Una sola culpable?',lugar:'Reserva de la Mariposa Monarca, Michoacán',coord:'19.6° N · 100.3° O',
+ nota:'3 de febrero. Cada invierno mido cuántas hectáreas cubren las mariposas en el bosque. Unos colegas culpan solo al clima; otros, solo a la tala. Los números cuentan otra historia.',
+ p1:{titulo:'Evidencia 1: hectáreas de mariposas',
+  grafica:()=>barras({datos:[['96-97',18.2],['04-05',2.2],['09-10',1.9],['13-14',.7],['14-15',1.1],['15-16',4],['18-19',6.1],['19-20',2.8],['21-22',2.8],['22-23',2.2],['23-24',.9]],unidad:'hectáreas',maxY:20,umbral:1,umbralTxt:'1 hectárea',color:v=>v<1?'#b3241c':'#e4661a',rotar:true}),
+  fuente:'Superficie de bosque ocupada por las colonias de mariposa monarca en invierno (temporadas seleccionadas). Datos aproximados del monitoreo de WWF México y la CONANP.',
+  pregunta:'El candado pide <b>cuántas temporadas estuvieron por debajo de 1 hectárea</b>.',
+  resp:2,pistas:['Fíjate en la línea punteada roja: marca 1 hectárea.','Cuenta las barras que no alcanzan la línea. Son las rojas.'],
+  dato:'Una hectárea es más o menos un campo de futbol y medio. En el invierno 1996-97 las mariposas cubrían más de 18 hectáreas; en los peores inviernos, menos de una.'},
+ p2:{tipo:'multiple',titulo:'Evidencia 2: los sospechosos',
+  intro:'Hay seis sospechosos. Solo <b>tres</b> tienen evidencia científica en su contra. Selecciónalos.',
+  ops:[
+   ['Pérdida de algodoncillo en Estados Unidos y Canadá, la única planta que comen sus orugas, por herbicidas y cambios en el uso del suelo.',true,''],
+   ['Tala ilegal y degradación del bosque de oyamel donde pasan el invierno.',true,''],
+   ['Sequías, olas de calor y tormentas extremas durante la migración y el invierno.',true,''],
+   ['El hoyo de la capa de ozono las quema con rayos ultravioleta.',false,'Confusión común: el hoyo de ozono y el cambio climático son problemas distintos, y no hay evidencia de que el ozono sea la causa.'],
+   ['El ruido y las luces de las ciudades las desorientan.',false,'No hay evidencia de que sea una causa importante: las colonias están en bosques lejos de las ciudades.'],
+   ['Los turistas que visitan los santuarios son la causa principal.',false,'El turismo mal manejado puede molestarlas, pero no explica la gran disminución.']],
+  revelado:'<b>Caso resuelto:</b> no hay una sola culpable. La mariposa monarca enfrenta <b>varias amenazas a la vez</b>: pérdida de su planta de alimento, deterioro del bosque y clima extremo. El cambio climático suma estrés a un problema que ya existía.'},
+ aprendiste:'Muchos problemas ambientales tienen varias causas al mismo tiempo; el cambio climático suele ser una de ellas, no la única.'},
+{id:'sonora',num:'EXP-03',titulo:'El pozo que se secó',lugar:'Costa de Hermosillo, Sonora',coord:'29.1° N · 111.4° O',
+ nota:'22 de junio. El pozo del rancho bajó otra vez. El dueño dice que «es la sequía». Puse dos gráficas lado a lado. Algo no cuadra.',
+ p1:{titulo:'Evidencia 1: la lluvia',
+  grafica:()=>barras({datos:[['15',360],['16',250],['17',240],['18',330],['19',230],['20',200],['21',340],['22',260],['23',220],['24',210]],unidad:'mm de lluvia al año',maxY:400,promedio:290,color:v=>v<290?'#e4661a':'#2f6fb3',
+   extra:'<text class="huevo-murcielago" x="348" y="26" font-size="11" opacity=".16" style="cursor:pointer">🦇</text>'}),
+  fuente:'Lluvia anual de 2015 a 2024 (los números abajo son los últimos dos dígitos del año). Datos simulados de la estación.',
+  pregunta:'El candado pide <b>en cuántos de los 10 años llovió menos que el promedio</b>.',
+  resp:7,pistas:['La línea punteada azul es el promedio. Las barras naranjas quedaron abajo.','Cuenta las barras naranjas.'],
+  dato:'Las sequías del noroeste de México se han vuelto más intensas, en parte por el calentamiento global: con más calor se evapora más agua del suelo.'},
+ p2:{tipo:'opcion',titulo:'Evidencia 2: el pozo',
+  grafica:()=>barras({datos:[['15',22],['16',24],['17',26],['18',27.5],['19',29.5],['20',31.5],['21',33],['22',35],['23',37],['24',39]],unidad:'metros de profundidad hasta el agua',maxY:40,linea:true,color:'#22307b'}),
+  fuente:'Profundidad a la que está el agua en el pozo. Mientras más alto el número, más hondo hay que ir por agua. Datos simulados.',
+  pregunta:'El agua siguió bajando incluso en 2018 y 2021, cuando llovió más que el promedio. ¿Qué lo explica mejor?',
+  ops:[
+   ['Se saca más agua del acuífero de la que la lluvia alcanza a reponer.',true,''],
+   ['El calor evapora el agua directamente desde el fondo del pozo.',false,'El agua subterránea está muy profunda y protegida; la evaporación ocurre en la superficie.'],
+   ['Fue solo la sequía: en cuanto llueve un año, el pozo se recupera.',false,'Si fuera así, el pozo habría subido en 2018 y 2021. No subió.'],
+   ['Los saguaros absorben el agua del acuífero.',false,'Las raíces del saguaro son poco profundas y casi no llegan al agua subterránea.']],
+  revelado:'<b>Caso resuelto:</b> hay <b>dos causas</b>. La sequía, intensificada por el calentamiento, trae menos lluvia. Pero el pozo baja sobre todo porque <b>se saca más agua de la que se repone</b>. Separar las causas ayuda a buscar soluciones: no podemos controlar la lluvia, pero sí cuánta agua sacamos.'},
+ aprendiste:'Una sequía y la sobreexplotación del agua pueden ocurrir juntas; distinguirlas permite saber qué sí podemos cambiar.'}
+];
+const ORDEN_BOVEDA=['caribe','monarca','sonora']; // de este a oeste
+
+/* ---------- Estado ---------- */
+const NUEVO=()=>({j:null,seg:0,errores:0,pistas:0,secretos:[],casos:{},bov:{pistas:0,falla:0},final:false,enviado:false});
+let E=ls.get('mc-estado',null)||NUEVO();
+const guardar=()=>ls.set('mc-estado',E);
+const C=id=>E.casos[id]||(E.casos[id]={p1:false,p2:false,pi1:0,pi2:0,falla:0,bloqueo:0,clasif:{},sel:[],orden:null});
+let timer=null;
+function correrReloj(){clearInterval(timer);timer=setInterval(()=>{if(document.hidden||E.final)return;E.seg++;$('#c-tiempo').textContent='⏱ '+mmss(E.seg);if(E.seg%5===0)guardar()},1000)}
+function mostrar(id){$$('.pantalla').forEach(p=>p.classList.toggle('activa',p.id===id));window.scrollTo(0,0)}
+function toast(t,ms=3200){const el=$('#toast');el.textContent=t;el.classList.add('ver');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('ver'),ms)}
+function modal(html){$('#modal-doc').innerHTML=html+`<div style="margin-top:14px"><button class="btn sec" data-cerrar-modal>Cerrar</button></div>`;$('#modal').classList.add('abierto')}
+document.addEventListener('click',e=>{if(e.target.closest('[data-cerrar-modal]')||e.target.id==='modal'){$('#modal').classList.remove('abierto');document.body.classList.remove('senal')}});
+
+/* ---------- Intro con máquina de escribir ---------- */
+const INTRO=`> RECUPERANDO ARCHIVO...
+> ESTACIÓN DE MONITOREO CLIMÁTICO «XÓLOTL»
+> ESTADO: ABANDONADA
+
+Hace dos años, la doctora Itzel Navarro dejó de enviar datos.
+Nadie volvió a verla.
+
+En su escritorio quedaron tres expedientes cerrados con candado
+y una bóveda que solo se abre con tres números.
+
+Su última nota decía:
+«La respuesta no está en lo que la gente cree.
+ Está en los datos.»`;
+let escribiendo=null;
+function escribir(){
+  const t=$('#terminal');t.classList.add('cursor');let i=0;
+  if(reduce){t.textContent=INTRO;return}
+  escribiendo=setInterval(()=>{i+=2;t.textContent=INTRO.slice(0,i);if(i>=INTRO.length){clearInterval(escribiendo);escribiendo=null}},28);
+}
+$('#b-continuar-intro').addEventListener('click',()=>{
+  if(escribiendo){clearInterval(escribiendo);escribiendo=null;$('#terminal').textContent=INTRO;return}
+  if(E.j){entrarEstacion();return}
+  const j=ls.get('mc-jugador',null);if(j){$('#i-nombre').value=j.nombre||'';$('#i-sec').value=j.secundaria||'';if(j.grado)$('#i-grado').value=j.grado;if(j.letra)$('#i-letra').value=j.letra}
+  mostrar('p-registro');
+});
+
+/* ---------- Registro ---------- */
+$('#b-entrar').addEventListener('click',()=>{
+  const nombre=$('#i-nombre').value.trim(),sec=$('#i-sec').value.trim();
+  if(nombre.length<2){$('#msg-reg').textContent='Escribe tu nombre.';return}
+  if(sec.length<3){$('#msg-reg').textContent='Escribe el nombre de tu secundaria.';return}
+  const j={nombre,secundaria:sec,grado:$('#i-grado').value,letra:$('#i-letra').value};
+  ls.set('mc-jugador',j);E=NUEVO();E.j=j;guardar();entrarEstacion();
+});
+
+/* ---------- Estación ---------- */
+const digito=id=>{const c=E.casos[id];return c&&c.p1&&c.p2?CASOS.find(x=>x.id===id).p1.resp:null};
+function entrarEstacion(){
+  correrReloj();$('#c-tiempo').textContent='⏱ '+mmss(E.seg);
+  const cerrados=CASOS.filter(c=>digito(c.id)!==null).length;
+  $('#c-dig').textContent=`🔑 ${cerrados}/3`;
+  pintarSecretos();
+  $('#nota-estacion').textContent=cerrados===0?'«Si alguien encuentra esto: cada expediente esconde un número. No lo adivines. Léelo en los datos. —I.N.»'
+    :cerrados<3?'«Vas bien. Cada número que encuentras es una pregunta que la gente dejó de hacerse. —I.N.»'
+    :'«Ya tienes los tres números. Pero el orden importa. Revisa la bóveda. —I.N.»';
+  $('#carpetas').innerHTML=CASOS.map(c=>{const d=digito(c.id);return `<button class="carpeta ${d!==null?'cerrado':''}" data-caso="${c.id}">
+    <span class="num">${c.num}</span><h3>${esc(c.titulo)}</h3><span class="lugar">${esc(c.lugar)}</span><br><span class="coord">${c.coord}</span>
+    <span class="estado">${d!==null?'RESUELTO · '+d:'SIN RESOLVER'}</span></button>`}).join('');
+  pintarBoveda();mostrar('p-estacion');
+}
+$('#carpetas').addEventListener('click',e=>{const b=e.target.closest('[data-caso]');if(b)abrirCaso(b.dataset.caso)});
+
+/* ---------- Bóveda ---------- */
+let bov=[0,0,0];
+function pintarBoveda(){
+  const listos=CASOS.every(c=>digito(c.id)!==null);
+  $('#ruedas-bov').innerHTML=bov.map((v,i)=>`<div class="rueda"><button data-r="${i}" data-d="1" aria-label="Subir">▲</button><span class="d">${v}</span><button data-r="${i}" data-d="-1" aria-label="Bajar">▼</button></div>`).join('');
+  $('#b-abrir').disabled=!listos;$('#b-pista-bov').disabled=!listos||E.bov.pistas>=2;
+  const n=$('#nota-bov');
+  if(listos){n.classList.remove('oculto');n.innerHTML='Nota pegada a la bóveda:<br>«Sigue al Sol. Empieza donde amanece primero.»'}
+  else n.classList.add('oculto');
+  $('#bov-txt').textContent=listos?'Tienes los tres números. ¿En qué orden van?':'Tres cerraduras. Tres expedientes. Cada uno guarda un número.';
+  const P=['El Sol sale por el este. ¿Cuál de los tres lugares está más al este?','Mira las coordenadas de cada expediente: mientras menor es la longitud oeste (O), más al este está el lugar.'];
+  $('#pistas-bov-txt').innerHTML=P.slice(0,E.bov.pistas).map(t=>`<div class="pista-txt" style="text-align:left">${t}</div>`).join('');
+}
+$('#ruedas-bov').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const i=+b.dataset.r;bov[i]=(bov[i]+(+b.dataset.d)+10)%10;pintarBoveda();if(i===0)vigilarRueda(bov[0])});
+$('#b-pista-bov').addEventListener('click',()=>{if(E.bov.pistas>=2)return;E.bov.pistas++;E.pistas++;guardar();pintarBoveda()});
+$('#b-abrir').addEventListener('click',()=>{
+  const codigo=bov.join(''),bueno=ORDEN_BOVEDA.map(digito).join('');
+  if(codigo===bueno){E.final=true;guardar();final();return}
+  E.errores++;E.bov.falla++;guardar();
+  const mismos=[...codigo].sort().join('')===[...bueno].sort().join('');
+  $('#msg-bov').className='msg mal';
+  $('#msg-bov').textContent=mismos?'Los números son correctos, pero el orden no. La bóveda vibra… y se vuelve a cerrar.':'Ese código no corresponde a los expedientes.';
+});
+
+/* ---------- Expediente ---------- */
+let casoActual=null;
+function abrirCaso(id){casoActual=CASOS.find(c=>c.id===id);pintarCaso();mostrar('p-caso')}
+$('#b-volver').addEventListener('click',entrarEstacion);
+function pintarCaso(){
+  const c=casoActual,s=C(c.id);
+  let h=`<span class="sello">${s.p1&&s.p2?'RESUELTO':'CLASIFICADO'}</span><span class="maquina muted">${c.num}</span>
+   <h2 style="margin-top:4px;padding-right:110px">${esc(c.titulo)}</h2><span class="muted">${esc(c.lugar)}</span><br><span class="coord">${c.coord}</span>
+   <div class="nota">${esc(c.nota)}<br>—I.N.</div>`;
+  // Paso 1
+  h+=`<div class="paso"><h3>${esc(c.p1.titulo)}${s.p1?' <span class="ok">✔</span>':''}</h3>
+   <div class="grafica">${c.p1.grafica()}</div><p class="fuente">${esc(c.p1.fuente)}</p>
+   <p>${c.p1.pregunta}</p>`;
+  if(s.p1)h+=`<div class="revelado">🔓 Número del expediente: <b style="font-family:var(--display);font-size:1.3rem">${c.p1.resp}</b><br>${esc(c.p1.dato)}</div>`;
+  else h+=`<div class="candado"><div class="rueda"><button data-c="1" aria-label="Subir">▲</button><span class="d" id="cd">${s.ultimo??0}</span><button data-c="-1" aria-label="Bajar">▼</button></div>
+     <div class="txt"><button class="btn" id="b-probar">Probar número</button><p class="msg" id="msg-p1" role="status"></p></div></div>
+     ${pistasHTML(c.p1.pistas,s.pi1,'p1')}`;
+  h+=`</div>`;
+  // Paso 2
+  h+=`<div class="paso"><h3>${esc(c.p2.titulo)}${s.p2?' <span class="ok">✔</span>':''}</h3>`;
+  if(!s.p1)h+=`<p class="muted">🔒 Abre primero el candado de la evidencia 1.</p>`;
+  else if(s.p2)h+=`<div class="revelado">${c.p2.revelado}</div>`;
+  else h+=paso2HTML(c,s);
+  h+=`</div>`;
+  if(s.p1&&s.p2)h+=`<div class="nota" style="margin-top:16px">Expediente cerrado. Anota el número <b>${c.p1.resp}</b> y las coordenadas: <b>${c.coord}</b>. La bóveda los va a necesitar.</div>
+    <button class="btn ancho" style="margin-top:8px" id="b-a-estacion">Volver a la estación</button>`;
+  $('#caso').innerHTML=h;
+}
+function pistasHTML(lista,usadas,paso){
+  return `<div class="pistab">${lista.slice(0,usadas).map(t=>`<div class="pista-txt">🔦 ${esc(t)}</div>`).join('')}
+    ${usadas<lista.length?`<button class="liga" style="color:var(--tinta)" data-pista="${paso}">Pedir pista a la bitácora (−${PTS.pista} puntos)</button>`:''}</div>`;
+}
+function paso2HTML(c,s){
+  const p=c.p2;let h=p.intro?`<p>${p.intro}</p>`:'';
+  if(p.grafica)h+=`<div class="grafica">${p.grafica()}</div><p class="fuente">${esc(p.fuente)}</p>`;
+  if(p.pregunta)h+=`<p><b>${esc(p.pregunta)}</b></p>`;
+  if(!s.orden)s.orden=barajar((p.fichas||p.ops).map((_,i)=>i));
+  if(p.tipo==='clasificar'){
+    if(p.misterios)h=p.misterios.map(([e,tt,d])=>`<div class="misterio"><span class="me">${e}</span><div><b>${tt}</b><br>${d}</div></div>`).join('')+h;
+    const hechas=Object.keys(s.clasif).length;
+    h+=`<p class="muted">Pistas clasificadas: <b>${hechas} de ${p.fichas.length}</b></p>`;
+    h+=s.orden.map(i=>{const f=p.fichas[i],v=s.clasif[i];const marca=s.rev&&s.rev[i]!==undefined?(s.rev[i]?' bien':' mal'):'';
+      return `<div class="ficha${marca}"><p><b>Pista:</b> ${esc(f[0])}</p><div class="dos">${p.cats.map((cn,k)=>`<button data-f="${i}" data-k="${k}" aria-pressed="${v===k}">${esc(cn)}</button>`).join('')}</div>
+      ${marca===' mal'?`<div class="expl">✘ ${esc(f[2])}</div>`:''}</div>`}).join('');
+    h+=`<button class="btn ancho" id="b-comprobar">Comprobar</button>`;
+  }else{
+    h+=s.orden.map(i=>{const o=p.ops[i],on=s.sel.includes(i);const marca=s.rev&&s.rev[i]!==undefined?(s.rev[i]?' bien':' mal'):'';
+      return `<button class="opc${marca}" data-o="${i}" aria-pressed="${on}">${esc(o[0])}${marca===' mal'&&o[2]?`<div class="expl">${esc(o[2])}</div>`:''}</button>`}).join('');
+    h+=`<button class="btn ancho" id="b-comprobar">${p.tipo==='multiple'?'Acusar a los tres sospechosos':'Elegir esta explicación'}</button>`;
+  }
+  h+=`<p class="msg" id="msg-p2" role="status"></p>`;
+  return h;
+}
+$('#caso').addEventListener('click',e=>{
+  const c=casoActual,s=C(c.id);
+  const rb=e.target.closest('[data-c]');
+  if(rb){if(s.bloqueo>Date.now())return;s.ultimo=((s.ultimo??0)+(+rb.dataset.c)+10)%10;$('#cd').textContent=s.ultimo;if(c.id==='caribe')vigilarRueda(s.ultimo);return}
+  if(e.target.closest('#b-probar')){probar(c,s);return}
+  const pi=e.target.closest('[data-pista]');
+  if(pi){const k=pi.dataset.pista==='p1'?'pi1':'pi2';s[k]++;E.pistas++;guardar();pintarCaso();return}
+  const f=e.target.closest('[data-f]');
+  if(f){s.clasif[f.dataset.f]=+f.dataset.k;if(s.rev)delete s.rev[f.dataset.f];guardar();pintarCaso();return}
+  const o=e.target.closest('[data-o]');
+  if(o){const i=+o.dataset.o;if(c.p2.tipo==='opcion')s.sel=[i];else s.sel=s.sel.includes(i)?s.sel.filter(x=>x!==i):[...s.sel,i];
+    if(s.rev)delete s.rev[i];guardar();pintarCaso();return}
+  if(e.target.closest('#b-comprobar')){comprobar(c,s);return}
+  if(e.target.closest('#b-a-estacion'))entrarEstacion();
+});
+function probar(c,s){
+  const msg=$('#msg-p1');
+  if(s.bloqueo>Date.now()){msg.className='msg mal';msg.textContent=`Candado bloqueado. Espera ${Math.ceil((s.bloqueo-Date.now())/1000)} s.`;return}
+  if((s.ultimo??0)===c.p1.resp){s.p1=true;guardar();pintarCaso();toast('🔓 El candado cedió.');return}
+  E.errores++;s.falla++;
+  if(s.falla%3===0){s.bloqueo=Date.now()+20000;guardar();msg.className='msg mal';msg.textContent='Tres intentos fallidos. El candado se bloqueó 20 segundos. Vuelve a mirar la gráfica.';
+    const t=setInterval(()=>{const r=Math.ceil((s.bloqueo-Date.now())/1000);const m=$('#msg-p1');if(!m||r<=0){clearInterval(t);if(m)m.textContent='Candado listo. Inténtalo de nuevo.';return}m.textContent=`Candado bloqueado: ${r} s. Vuelve a mirar la gráfica.`},1000)}
+  else{guardar();msg.className='msg mal';msg.textContent='El candado no cede. Vuelve a mirar la gráfica.'}
+}
+function comprobar(c,s){
+  const p=c.p2,msg=$('#msg-p2');s.rev={};
+  if(p.tipo==='clasificar'){
+    if(Object.keys(s.clasif).length<p.fichas.length){msg.className='msg mal';msg.textContent='Clasifica las seis pistas antes de comprobar.';return}
+    let malas=0;p.fichas.forEach((f,i)=>{const ok=s.clasif[i]===f[1];s.rev[i]=ok;if(!ok)malas++});
+    if(!malas){s.p2=true;guardar();pintarCaso();toast('📁 Expediente cerrado.');return}
+    E.errores++;guardar();pintarCaso();$('#msg-p2').className='msg mal';$('#msg-p2').textContent=`${malas} ${malas===1?'pista está':'pistas están'} en el misterio equivocado. Lee la explicación en rojo y cámbiala.`;return}
+  if(p.tipo==='multiple'){
+    if(s.sel.length!==3){msg.className='msg mal';msg.textContent=`Debes acusar exactamente a tres sospechosos (llevas ${s.sel.length}).`;return}
+    let malas=0;s.sel.forEach(i=>{const ok=p.ops[i][1];s.rev[i]=ok;if(!ok)malas++});
+    if(!malas){s.p2=true;guardar();pintarCaso();toast('📁 Expediente cerrado.');return}
+    E.errores++;guardar();pintarCaso();$('#msg-p2').className='msg mal';$('#msg-p2').textContent=`${malas} de tus acusados ${malas===1?'es inocente':'son inocentes'}. Lee por qué.`;return}
+  if(!s.sel.length){msg.className='msg mal';msg.textContent='Elige una explicación.';return}
+  const i=s.sel[0];s.rev[i]=p.ops[i][1];
+  if(p.ops[i][1]){s.p2=true;guardar();pintarCaso();toast('📁 Expediente cerrado.');return}
+  E.errores++;guardar();pintarCaso();$('#msg-p2').className='msg mal';$('#msg-p2').textContent='Esa explicación no cuadra con los datos.';
+}
+
+/* ---------- Final ---------- */
+function puntos(){return Math.max(0,PTS.base-E.errores*PTS.error-E.pistas*PTS.pista+E.secretos.length*PTS.secreto)}
+function final(){
+  clearInterval(timer);
+  const n=esc(E.j.nombre.split(' ')[0]);
+  $('#carta').innerHTML=`<p>${n}:</p>
+   <p>Si estás leyendo esto, abriste la bóveda. Te debo una explicación.</p>
+   <p>No desaparecí por un accidente. Me fui a seguir midiendo: a otras boyas, otros bosques, otros pozos. Dejé esta estación como una prueba, porque los datos no sirven de nada si nadie aprende a leerlos.</p>
+   <p>Tú descubriste que el coral blanco y el sargazo no son lo mismo, que la monarca no tiene una sola culpable y que un pozo puede secarse por más de una razón. Eso es lo que hace la ciencia: no se queda con la primera explicación.</p>
+   <p>El cambio climático no se detiene abriendo una bóveda. Se enfrenta con muchas decisiones, de muchas personas, durante muchos años. La primera ya la tomaste: preguntar qué dicen los datos.</p>
+   <p>De los datos a la acción. Ahora te toca a ti.</p>
+   <p style="text-align:right">—Dra. Itzel Navarro</p>`;
+  $('#descubriste').innerHTML=CASOS.map(c=>`<li style="margin-bottom:6px">${esc(c.aprendiste)}</li>`).join('');
+  $('#cuentas').innerHTML=`<tr><td>Puntos de inicio</td><td>${PTS.base}</td></tr>
+   <tr><td>${E.errores} ${E.errores===1?'error':'errores'}</td><td>−${E.errores*PTS.error}</td></tr>
+   <tr><td>${E.pistas} ${E.pistas===1?'pista':'pistas'}</td><td>−${E.pistas*PTS.pista}</td></tr>
+   ${E.secretos.length?`<tr><td>✦ ${E.secretos.length} ${E.secretos.length===1?'secreto':'secretos'}</td><td>+${E.secretos.length*PTS.secreto}</td></tr>`:''}
+   <tr><td><b>Total</b></td><td style="font-family:var(--display);font-size:1.3rem">${puntos()}</td></tr>
+   <tr><td>Tiempo</td><td>${mmss(E.seg)}</td></tr>`;
+  const url=urlRegistro();$('#b-enviar').disabled=!url||E.enviado;
+  $('#msg-final').className='msg';$('#msg-final').textContent=url?(E.enviado?'Tu expediente ya está en el registro.':''):'El registro en línea no está disponible.';
+  mostrar('p-final');cargarRanking(false);
+}
+function urlRegistro(){return ls.get('mc-url','')||CONFIG.urlAppsScript||''}
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+async function cargarRanking(solo){
+  const d=$('#ranking'),url=urlRegistro();
+  const seg=`<div class="seg" role="group" aria-label="Filtro"><button data-rk="0" aria-pressed="${!solo}">Todas</button><button data-rk="1" aria-pressed="${!!solo}">Mi secundaria</button></div>`;
+  if(!url){d.innerHTML='<p class="muted">Sin conexión al registro.</p>';return}
+  d.innerHTML=seg+'<p class="muted">Consultando el registro…</p>';
+  try{const r=await fetch(url+(url.includes('?')?'&':'?')+'accion=ranking&juego=mision'+(solo?'&secundaria='+encodeURIComponent(E.j.secundaria):''));const j=await r.json();
+    if(!j.ok)throw 0;let f=j.filas||[];if(solo)f=f.filter(x=>norm(x.secundaria)===norm(E.j.secundaria));
+    d.innerHTML=seg+(f.length?`<div class="scroll-x"><table class="tabla-rank"><tr><th>#</th><th>Nombre</th><th>Secundaria</th><th>Puntos</th><th>Tiempo</th></tr>${f.slice(0,20).map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.nombre)}${x.secretos>=3?' ✦':''}</td><td>${esc(x.secundaria)}</td><td>${x.puntos}</td><td>${mmss(+x.tiempo||0)}</td></tr>`).join('')}</table></div>`:'<p class="muted">Todavía no hay expedientes registrados.</p>');
+  }catch(e){d.innerHTML=seg+'<p class="muted">No se pudo consultar el registro. Revisa tu conexión.</p>'}
+}
+$('#ranking').addEventListener('click',e=>{const b=e.target.closest('[data-rk]');if(b)cargarRanking(b.dataset.rk==='1')});
+$('#b-enviar').addEventListener('click',async()=>{
+  const url=urlRegistro();if(!url||E.enviado)return;const b=$('#b-enviar');b.disabled=true;$('#msg-final').textContent='Enviando…';
+  const body=JSON.stringify({juego:'mision',nombre:E.j.nombre,secundaria:E.j.secundaria,grupo:E.j.grado+' '+E.j.letra,puntos:puntos(),tiempo:E.seg,errores:E.errores,pistas:E.pistas,secretos:E.secretos.length});
+  try{const r=await fetch(url,{method:'POST',body});const j=await r.json();if(!j.ok)throw 0;E.enviado=true;guardar();$('#msg-final').className='msg bien';$('#msg-final').textContent='Expediente enviado al registro.'}
+  catch(e){try{await fetch(url,{method:'POST',body,mode:'no-cors'});E.enviado=true;guardar();$('#msg-final').className='msg';$('#msg-final').textContent='Enviado. Si no aparece en el registro en unos segundos, avisa a tu profesor.'}
+    catch(e2){b.disabled=false;$('#msg-final').className='msg mal';$('#msg-final').textContent='No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.'}}
+  cargarRanking(false);
+});
+$('#b-copiar').addEventListener('click',async()=>{
+  const t=[`MISIÓN CLIMA: EXPEDIENTE MÉXICO`,`${E.j.nombre} | ${E.j.secundaria} | ${E.j.grado} ${E.j.letra}`,`Puntos: ${puntos()} | Tiempo: ${mmss(E.seg)} | Errores: ${E.errores} | Pistas: ${E.pistas}`,'','Lo que descubrí:',...CASOS.map(c=>`- ${c.aprendiste}`)].join('\n');
+  let ok=false;try{await navigator.clipboard.writeText(t);ok=true}catch(e){const ta=document.createElement('textarea');ta.value=t;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();try{ok=document.execCommand('copy')}catch(e2){}ta.remove()}
+  $('#msg-final').className='msg';$('#msg-final').textContent=ok?'Resumen copiado.':'No se pudo copiar automáticamente.';
+});
+$('#b-nueva').addEventListener('click',()=>{if(!confirmar2())return;ls.del('mc-estado');E=NUEVO();bov=[0,0,0];mostrar('p-registro')});
+let nuevaArmada=0;function confirmar2(){if(Date.now()-nuevaArmada<3000)return true;nuevaArmada=Date.now();toast('Toca otra vez para borrar tu progreso y empezar de nuevo.');return false}
+
+/* ---------- Secretos ---------- */
+const SECRETOS={lampara:'La lámpara',murcielago:'El visitante nocturno',senal:'La señal perdida'};
+function pintarSecretos(){const n=E.secretos.length;const c=$('#c-sec');c.classList.toggle('oculto',n===0);c.textContent=`✦ ${n}/3`}
+function secreto(id,html){
+  if(!E.j)return;
+  const nuevo=!E.secretos.includes(id);
+  if(nuevo){E.secretos.push(id);guardar();pintarSecretos()}
+  if(html)modal(html+(nuevo?`<p class="maquina" style="margin-top:10px">✦ Secreto ${E.secretos.length} de 3 encontrado (+${PTS.secreto} puntos).</p>`:''));
+  else toast(nuevo?`✦ Secreto ${E.secretos.length} de 3 encontrado (+${PTS.secreto} puntos)`:'✦ Ya habías encontrado este secreto.');
+}
+// 1. La lámpara: tócala 7 veces
+let toques=0,tLamp=0;
+$('#lampara').addEventListener('click',()=>{const ahora=Date.now();toques=ahora-tLamp<1500?toques+1:1;tLamp=ahora;
+  if(toques>=7){toques=0;secreto('lampara',`<span class="sello">PERSONAL</span><h3>Bitácora personal de I.N.</h3>
+    <p class="maquina">Día 412. Xoco sigue en su pecera junto a la ventana. Le doy acociles los martes. Es el único habitante de la estación que nunca se queja del calor… aunque el termómetro del agua dice que debería.</p>
+    <p class="maquina">Si alguien encontró esta nota, cuida a Xoco. Los ajolotes necesitan agua fría y limpia.</p>`)}});
+// 2. El murciélago escondido en la gráfica de lluvia
+document.addEventListener('click',e=>{if(e.target.closest('.huevo-murcielago'))secreto('murcielago',`<h3>🦇 El visitante nocturno</h3>
+  <p class="maquina">El murciélago magueyero vuela cientos de kilómetros siguiendo la floración de cactus y agaves. Sin él, muchas flores del desierto no se polinizarían. Te encontró antes de que tú lo encontraras a él.</p>`)});
+// 3. La señal perdida: código Konami en el teclado
+const KON=['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];let kp=0;
+document.addEventListener('keydown',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;kp=k===KON[kp]?kp+1:(k===KON[0]?1:0);
+  if(kp===KON.length){kp=0;activarSenal()}});
+function activarSenal(){document.body.classList.add('senal');secreto('senal',`<h3>📡 Señal perdida</h3>
+   <p class="maquina">…transmisión interceptada… frecuencia Weird Games… «Los mejores investigadores no siguen las instrucciones: buscan lo que nadie mira.»…fin de la transmisión…</p>
+`)}
+// 3b. La señal perdida en celular: en una rueda, deja el 1 quieto un segundo y luego el 7 otro segundo
+const vg={t:null,ult:0,seq:[]};
+function vigilarRueda(v){clearTimeout(vg.t);vg.t=setTimeout(()=>{if(vg.ult===v)return;vg.ult=v;vg.seq=[...vg.seq,v].slice(-2);
+  if(vg.seq[0]===1&&vg.seq[1]===7){vg.seq=[];activarSenal()}},1000)}
+
+/* ---------- Panel docente oculto ---------- */
+if(new URLSearchParams(location.search).has('docente')){
+  modal(`<h3>Configuración del docente</h3><label class="campo">URL /exec de Apps Script (solo este navegador)<input id="cfg-url" value="${esc(urlRegistro())}"></label>
+   <button class="btn" id="cfg-guardar">Guardar</button> <button class="btn sec" id="cfg-borrar">Borrar progreso de este equipo</button><p class="msg" id="cfg-msg"></p>`);
+  document.addEventListener('click',e=>{
+    if(e.target.id==='cfg-guardar'){const u=$('#cfg-url').value.trim();u?ls.set('mc-url',u):ls.del('mc-url');$('#cfg-msg').textContent='Guardado.'}
+    if(e.target.id==='cfg-borrar'){ls.del('mc-estado');E=NUEVO();$('#cfg-msg').textContent='Progreso borrado.'}});
+}
+
+/* ---------- Arranque ---------- */
+if(E.final&&E.j){final()}
+else{escribir();if(E.j)$('#b-continuar-intro').textContent='Continuar investigación'}
+})();
+</script>
+</body>
+</html>
